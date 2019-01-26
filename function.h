@@ -8,10 +8,11 @@
 #include <iostream>
 #include <memory>
 #include <cstring>
+#include <functional>
 
 const int FUNCTION_BUFFER_SIZE = 64;
 
-enum TYPE {
+enum class TYPE {
     EMPTY = 0,
     SMALL,
     BIG
@@ -59,34 +60,34 @@ private:
     };
     TYPE type;
 public:
-    function() : func(nullptr), type(EMPTY) {}
+    function() : func(nullptr), type(TYPE::EMPTY) {}
 
-    explicit function(std::nullptr_t) : func(nullptr), type(EMPTY) {}
+    explicit function(std::nullptr_t) : func(nullptr), type(TYPE::EMPTY) {}
 
     function(const function &other) : func(nullptr), type(other.type) {
         switch (type) {
-            case EMPTY:
+            case TYPE::EMPTY:
                 func = nullptr;
                 break;
-            case SMALL:
+            case TYPE::SMALL:
                 memcpy(this->buf, other.buf, FUNCTION_BUFFER_SIZE);
                 break;
-            case BIG:
+            case TYPE::BIG:
                 func = (std::move(other.func->copy()));
         }
     }
 
-    function(function &&other) noexcept {
+    function(function &&other) noexcept : func(nullptr), type(TYPE::EMPTY) {
         this->swap(other);
     }
 
     template<typename F>
     function(F f) {
         if (sizeof(holder<F>(f)) <= FUNCTION_BUFFER_SIZE) {
-            type = SMALL;
+            type = TYPE::SMALL;
             new(this->buf) holder<F>(std::move(f));
         } else {
-            type = BIG;
+            type = TYPE::BIG;
             new(this->buf) std::unique_ptr<holder<F>>(std::make_unique<holder<F>>(std::move(f)));
         }
     }
@@ -101,23 +102,23 @@ public:
         return static_cast<bool>(func);
     }
 
-    T operator()(Args... args) const {
+    T operator()(Args&&... args) const {
         switch (type) {
-            case EMPTY:
+            case TYPE::EMPTY:
                 throw std::bad_function_call();
-            case SMALL:
+            case TYPE::SMALL:
                 return ((base_holder *) (buf))->invoke(std::forward<Args>(args)...);
-            case BIG:
+            case TYPE::BIG:
                 return func->invoke(std::forward<Args>(args)...);
         }
     }
 
     ~function() {
         switch (type) {
-            case SMALL:
+            case TYPE::SMALL:
                 ((base_holder*)this->buf)->~base_holder();
                 break;
-            case BIG:
+            case TYPE::BIG:
                 this->func.reset();
         }
     }
@@ -130,6 +131,10 @@ public:
 
     function &operator=(function &&other) noexcept {
         this->swap(other);
+        if (other.type == TYPE::BIG) {
+            other.func.reset();
+        }
+        other.type = TYPE::EMPTY;
         return *this;
     }
 

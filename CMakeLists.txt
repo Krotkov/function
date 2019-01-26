@@ -3,4 +3,4 @@ project(function)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(function main.cpp function.h)
+add_executable(function main.cpp)

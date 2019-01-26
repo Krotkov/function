@@ -17,5 +17,8 @@ int main() {
     f(10);
     function<void(void)> f1 = std::bind(print_num, 3);
     f1();
+    function<void()> ff(nullptr);
+    function<void()> fff(ff);
+    //fff();
     return 0;
 }
