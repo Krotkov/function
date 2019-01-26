@@ -31,6 +31,8 @@ private:
         virtual T invoke(Args &&...) = 0;
 
         virtual std::unique_ptr<base_holder> copy() const = 0;
+
+        virtual void make_small(void* m) = 0;
     };
 
     template<typename S>
@@ -39,6 +41,10 @@ private:
         holder(const S &t) : value(t) {}
 
         holder(S &&t) : value(std::move(t)) {}
+
+        void make_small(void* m) {
+            new(m) holder<S>(value);
+        }
 
         ~holder() = default;
 
@@ -65,12 +71,14 @@ public:
     explicit function(std::nullptr_t) : func(nullptr), type(TYPE::EMPTY) {}
 
     function(const function &other) : func(nullptr), type(other.type) {
+        base_holder * p = (base_holder * ) other.buf;
         switch (type) {
             case TYPE::EMPTY:
                 func = nullptr;
                 break;
             case TYPE::SMALL:
-                memcpy(this->buf, other.buf, FUNCTION_BUFFER_SIZE);
+                p->make_small(buf);
+                //memcpy(this->buf, other.buf, FUNCTION_BUFFER_SIZE);
                 break;
             case TYPE::BIG:
                 func = (std::move(other.func->copy()));
