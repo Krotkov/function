@@ -1,0 +1,3 @@
+C:/Users/krotk/Documents/GitHub/function/cmake-build-debug/CMakeFiles/function.dir
+C:/Users/krotk/Documents/GitHub/function/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/krotk/Documents/GitHub/function/cmake-build-debug/CMakeFiles/rebuild_cache.dir
