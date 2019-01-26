@@ -7,7 +7,7 @@
 
 #include <iostream>
 #include <memory>
-
+#include <bits/stdc++.h>
 
 template<typename>
 class function;
