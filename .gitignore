@@ -1,0 +1,11 @@
+
+.idea/vcs.xml
+.idea/workspace.xml
+.idea/workspace.xml
+*.xml
+cmake-build-debug/CMakeFiles/clion-log.txt
+cmake-build-debug/CMakeFiles/function.dir/CXX.includecache
+cmake-build-debug/CMakeFiles/function.dir/depend.internal
+cmake-build-debug/CMakeFiles/function.dir/main.cpp.obj
+cmake-build-debug/CMakeFiles/function.dir/objects.a
+*.exe
